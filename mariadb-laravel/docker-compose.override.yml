@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  php:
+    build:
+      target: local
+      args:
+        - BUILD_UID=1000
+        - BUILD_GID=1000
+    volumes:
+      - ./:/var/www/html:cached
+
+  nginx:
+    image: wodby/nginx
+    depends_on:
+      - php
+    environment:
+      NGINX_STATIC_OPEN_FILE_CACHE: "off"
+      NGINX_ERROR_LOG_LEVEL: debug
+      NGINX_BACKEND_HOST: php
+      NGINX_VHOST_PRESET: php
+      NGINX_SERVER_ROOT: /var/www/html/public
+      NGINX_SERVER_EXTRA_CONF_FILEPATH: /etc/nginx/extra.conf
+    volumes:
+      - ./docker/nginx/extra.conf:/etc/nginx/extra.conf:delegated
+      - ./public:/var/www/html/public:delegated
+      - ./node_modules:/var/www/html/node_modules:delegated
+    networks:
+      - default
+
+  mariadb:
+    command: --init-file /data/application/init.sql
+    volumes:
+      - mariadb:/var/lib/mysql
+      - ./docker/mariadb/init.sql:/data/application/init.sql
+    ports:
+      - "127.0.0.1:50601:3306"
+
+volumes:
+  mariadb:
+    driver: local

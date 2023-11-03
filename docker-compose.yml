@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:11.1
+    environment:
+      MYSQL_DATABASE: skilltree
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: skilltree
+      MYSQL_PASSWORD: skilltree
+    ports:
+      - "60100:3306"

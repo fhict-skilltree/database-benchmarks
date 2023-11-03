@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  php:
+    build:
+      context: ./
+      dockerfile: docker/php/Dockerfile
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+  mariadb:
+    image: mariadb:10.4
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-utest", "-ptest", "--silent" ]
+      interval: 10s
+      timeout: 2s
+      retries: 10
