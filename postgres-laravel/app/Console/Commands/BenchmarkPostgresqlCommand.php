@@ -10,12 +10,12 @@ use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 
-class BenchmarkMariadbCommand extends Command
+class BenchmarkPostgresqlCommand extends Command
 {
     private const MEMORY_STREAM_20MB = 20971520;
     private const CSV_SEPARATOR = ';';
 
-    protected $signature = 'app:benchmark-mariadb {skills-depth} {benchmark-count} {sleep-after-query}';
+    protected $signature = 'app:benchmark-postgresql {skills-depth} {benchmark-count} {sleep-after-query}';
 
     protected $description = '';
 
@@ -25,6 +25,12 @@ class BenchmarkMariadbCommand extends Command
 
     public function handle(FilesystemManager $filesystemManager): int
     {
+//        $skilltree = Skilltree::first();
+//
+//        dump($this->benchmarkQuery($skilltree));
+//
+//
+//        return 0;
         $this->filesystemManager = $filesystemManager;
 
         $this->info('Refreshing database');
@@ -141,7 +147,7 @@ class BenchmarkMariadbCommand extends Command
         });
 
         $fileName = sprintf(
-            '%s-mariadb-benchamrks.csv',
+            '%s-postgresql-benchamrks.csv',
             Carbon::now()->format('Y-m-d-H-i-s-u'),
         );
 
