@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  php:
+    build:
+      context: ./
+      dockerfile: docker/php/Dockerfile
+
+  mysql:
+    image: mysql/mysql-server:8.0
+    command: --max_allowed_packet=32505856
+    working_dir: /application
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
