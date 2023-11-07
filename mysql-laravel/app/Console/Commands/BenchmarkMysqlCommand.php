@@ -121,10 +121,6 @@ class BenchmarkMysqlCommand extends Command
         $this->info('Average query time: ' . $averageQueryTime . 'ms' );
     }
 
-    private function microToMiliseconds($time) {
-        return $time * 1000;
-    }
-
     private function exportAverageQueryTimePerDepth(array $benchmarkResults)
     {
         $csvMemoryStream = fopen('php://temp/maxmemory:'.self::MEMORY_STREAM_20MB, 'rw+');
