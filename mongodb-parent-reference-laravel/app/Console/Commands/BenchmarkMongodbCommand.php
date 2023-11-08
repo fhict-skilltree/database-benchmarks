@@ -10,12 +10,12 @@ use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 
-class BenchmarkMariadbCommand extends Command
+class BenchmarkMongodbCommand extends Command
 {
     private const MEMORY_STREAM_20MB = 20971520;
     private const CSV_SEPARATOR = ';';
 
-    protected $signature = 'app:benchmark-mariadb {skills-depth} {benchmark-count} {sleep-after-query}';
+    protected $signature = 'app:benchmark-mongodb {skills-depth} {benchmark-count} {sleep-after-query}';
 
     protected $description = '';
 
@@ -44,14 +44,13 @@ class BenchmarkMariadbCommand extends Command
 
         $numberOfChildSkills = 1;
         $deepestSkill = $skill;
-
         do {
             $numberOfBenchmarks = 0;
-
             $benchmarks = [];
+
             while ($numberOfBenchmarks < $benchmarkCount) {
                 try {
-                    $benchmarks[] = $s = $this->benchmarkQuery($skilltree);
+                    $benchmarks[] = $s = $this->benchmarkQuery() * 1000;
                     $this->info('Time: ' . $s . 'ms');
                     usleep($sleepAfterQuery);
 
@@ -81,6 +80,9 @@ class BenchmarkMariadbCommand extends Command
 
     private function createNewChildSkill(Skill $parentSkill): Skill
     {
+        return $parentSkill->skills()->save(Skill::factory()->create([
+            'parent_id'  => $parentSkill->id,
+        ]));
         return Skill::factory()->create([
             'parent_id'  => $parentSkill->id,
         ]);
@@ -89,21 +91,12 @@ class BenchmarkMariadbCommand extends Command
     /**
      * @return float seconds
      */
-    private function benchmarkQuery(Skilltree $skilltree): float
+    private function benchmarkQuery(): float
     {
-        $query = Skill::whereNull('parent_id')
-            ->where('skilltree_id', $skilltree->id)
-            ->unionAll(
-                Skill::select('skills.*')
-                    ->join('tree', 'tree.id', '=', 'skills.parent_id')
-            );
-
-        $tree = Skill::from('tree')
-            ->withRecursiveExpression('tree', $query)
-            ->getQuery();
+        $skill = Skill::first();
 
         $startTime = microtime(true);
-        $tree->get();
+        Skill::where('path', "/,$skill->id,/")->get();
         $endTime = microtime(true);
 
         return $endTime - $startTime;
@@ -137,7 +130,7 @@ class BenchmarkMariadbCommand extends Command
         });
 
         $fileName = sprintf(
-            '%s-mariadb-benchamrks.csv',
+            '%s-mongodb-materialized-paths-benchamrks.csv',
             Carbon::now()->format('Y-m-d-H-i-s-u'),
         );
 
