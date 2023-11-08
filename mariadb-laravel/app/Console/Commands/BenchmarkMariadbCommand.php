@@ -51,7 +51,7 @@ class BenchmarkMariadbCommand extends Command
             $benchmarks = [];
             while ($numberOfBenchmarks < $benchmarkCount) {
                 try {
-                    $benchmarks[] = $s = $this->benchmarkQuery($skilltree);
+                    $benchmarks[] = $s = $this->benchmarkQuery($skilltree) * 1000;
                     $this->info('Time: ' . $s . 'ms');
                     usleep($sleepAfterQuery);
 

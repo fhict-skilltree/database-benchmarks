@@ -34,7 +34,7 @@ services:
       - mariadb:/var/lib/mysql
       - ./docker/mariadb/init.sql:/data/application/init.sql
     ports:
-      - "127.0.0.1:50601:3306"
+      - "127.0.0.1:50701:3306"
 
 volumes:
   mariadb:
